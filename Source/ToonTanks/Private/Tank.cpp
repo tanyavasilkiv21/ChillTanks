@@ -7,8 +7,9 @@
 #include "Components/InputComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
-#include "Components/CapsuleComponent.h"
+#include "ToonTanksPlayerController.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Navigation/PathFollowingComponent.h"
 
 ATank::ATank()
 {
@@ -18,6 +19,9 @@ ATank::ATank()
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm);
 	GetBaseMesh()->SetSimulatePhysics(true);
+	GetBaseMesh()->SetRelativeRotation(FRotator::ZeroRotator);
+	GetTurretMesh()->SetRelativeRotation(FRotator::ZeroRotator);
+	SetActorTickEnabled(false);
 }
 
 void ATank::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -40,7 +44,7 @@ void ATank::HandleDistraction()
 void ATank::BeginPlay()
 {
 	Super::BeginPlay();
-	TankPlayerController = Cast<APlayerController>(GetController());
+	TankPlayerController = Cast<AToonTanksPlayerController>(GetController());
 }
 
 void ATank::Move(float Value)
@@ -54,29 +58,24 @@ void ATank::Turn(float Value)
 	RotationActor.Yaw = Value * (UGameplayStatics::GetWorldDeltaSeconds(this)) * TurnRate;
 	GetBaseMesh()->AddRelativeRotation(RotationActor);
 	GetTurretMesh()->SetRelativeRotation(GetBaseMesh()->GetComponentRotation());
-	
-	UE_LOG(LogActor, Warning, TEXT("Rotation Base ptch:%f yaw: %f roll:%f"), GetBaseMesh()->GetComponentRotation().Pitch,
-		GetBaseMesh()->GetComponentRotation().Yaw, GetBaseMesh()->GetComponentRotation().Roll);
-	UE_LOG(LogActor, Warning, TEXT("Rotation Turret ptch:%f yaw: %f roll:%f"), GetTurretMesh()->GetComponentRotation().Pitch,
-		GetTurretMesh()->GetComponentRotation().Yaw, GetTurretMesh()->GetComponentRotation().Roll);
 }
 
 void ATank::RotatePawn(FVector LookAtTarget)
 {
-	const FVector ToTarget =  GetBaseMesh()->GetComponentLocation() - LookAtTarget;
-	const FRotator LookAtRotation = FRotator(0.f, ToTarget.Rotation().Yaw , 0.f);
-	
-	UE_LOG(LogActor, Warning, TEXT("LookAtRotation ptch:%f yaw: %f roll:%f"), LookAtRotation.Pitch,
-		LookAtRotation.Yaw, LookAtRotation.Roll);
-	GetTurretMesh()->SetRelativeRotation(LookAtRotation);
-	//UKismetMathLibrary::InverseTransformRotation()
+	const FVector ToTarget =  GetTurretMesh()->GetComponentLocation() - LookAtTarget;
+	const FRotator LookAtRotation = FRotator(0.f, ToTarget.ToOrientationRotator().Yaw , 0.f);
+	FRotator Temp = LookAtRotation - GetTurretMesh()->GetRelativeRotation();
+	Temp.Yaw += -180;
+	Temp.Pitch = 0;
+	Temp.Roll = 0;
+	GetTurretMesh()->SetRelativeRotation(Temp);
 }
 
 void ATank::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if(TankPlayerController)
+	if(TankPlayerController && TankPlayerController->IsEnable())
 	{
 		FHitResult HitResult;
 		TankPlayerController->GetHitResultUnderCursor(ECC_Visibility, false, HitResult);

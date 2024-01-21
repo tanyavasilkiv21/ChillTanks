@@ -35,6 +35,7 @@ void AToonTanksGameMode::ActorDied(AActor* DeadActor)
 	}
 }
 
+
 void AToonTanksGameMode::HandleGameStart()
 {
 	Player = Cast<ATank>(UGameplayStatics::GetPlayerPawn(this, 0));

@@ -25,8 +25,7 @@ private:
 	class AToonTanksPlayerController * ToonTanksPlayerController;
 
 	float StartDelay = 3.f;
-
 	void HandleGameStart();
-
+	
 	int32 GetTargetTowerCount();
 };

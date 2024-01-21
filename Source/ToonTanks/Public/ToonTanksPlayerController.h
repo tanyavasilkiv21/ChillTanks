@@ -18,6 +18,9 @@ protected:
 private:
 	GENERATED_BODY()
 
+	bool bPlayerEnable = false;
 public:
-	void SetPlayerEnabledState(bool bPlayerEnabled);
+	void SetPlayerEnabledState(bool bPlayerEnabledData);
+	bool IsEnable();
+	
 };

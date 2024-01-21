@@ -35,7 +35,7 @@ private:
 	void Turn(float Value);
 	
 	void RotatePawn(FVector LookAtTarget) override;
-	APlayerController* TankPlayerController;
+	class AToonTanksPlayerController* TankPlayerController;
 
 public:	
 	// Called every frame
