@@ -2,17 +2,16 @@
 
 
 #include "Projectile.h"
-#include "Components/CapsuleComponent.h"
+
+#include "HitBoxComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "GameFramework/DamageType.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Camera/CameraShakeBase.h"
 
-// Sets default values
 AProjectile::AProjectile()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 	
 	ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Projectile Mesh"));
@@ -26,19 +25,20 @@ AProjectile::AProjectile()
 	TrailParticles->SetupAttachment(ProjectileMesh);
 }
 
-// Called when the game starts or when spawned
 void AProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-	ProjectileMesh->OnComponentHit.AddDynamic(this, &AProjectile::OnHit);
+	
+	ProjectileMesh->OnComponentBeginOverlap.AddDynamic(this, &AProjectile::BeginOverlap);
+	
 	if(LaunchSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, LaunchSound, GetActorLocation(), GetActorRotation());
 	}
 }
 
-void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-	FVector NormalImpulse, const FHitResult& Hit)
+void AProjectile::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	auto const MyOwner = GetOwner();
 	if(MyOwner == nullptr)
@@ -46,12 +46,20 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimi
 		Destroy();
 		return;
 	};
-	auto const MyOwnerInstigator = MyOwner->GetInstigatorController();
-	auto const DamageTypeClass = UDamageType::StaticClass();
-
+	UE_LOG(LogTemp, Warning, TEXT("Name of component: %s"), *OtherComp->GetName());
+	auto HitBox = Cast<UHitBoxComponent>(OtherComp);
 	if(OtherActor && OtherActor!= nullptr && OtherActor != MyOwner && !(OtherActor->IsHidden()))
 	{
-		UGameplayStatics::ApplyDamage(OtherActor, Damage, MyOwnerInstigator, this, DamageTypeClass);
+		if(HitBox)
+		{
+			HitBox->DamageReduced(Damage);
+			this->Destroy();
+		}
+		else
+		{
+			return;
+		}
+		//UGameplayStatics::ApplyDamage(OtherActor, Damage, MyOwnerInstigator, this, DamageTypeClass);
 		if(HitCameraShakeClass)
 		{
 			GetWorld()->GetFirstPlayerController()->ClientStartCameraShake(HitCameraShakeClass);
@@ -68,10 +76,8 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimi
 	Destroy();
 }
 
-// Called every frame
 void AProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 

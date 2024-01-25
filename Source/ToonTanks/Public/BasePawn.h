@@ -12,21 +12,20 @@ class TOONTANKS_API ABasePawn : public APawn
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this pawn's properties
+	 //functions
 	ABasePawn();
-
 	virtual void HandleDistraction();
-protected:
-
-	virtual void RotatePawn(FVector LookAtTarget);
-	void Fire();
-	
 	UStaticMeshComponent* GetBaseMesh();
 	UStaticMeshComponent* GetTurretMesh();
 	USceneComponent* GetProjectileSpawn();
+	
+protected:
+	//functions
+	virtual void RotatePawn(FVector LookAtTarget);
+	void Fire();
+	
 private:
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	//UCapsuleComponent* CapsuleComp;
+	//variables for pawn
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* BaseMesh;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
@@ -34,15 +33,23 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	USceneComponent* ProjectileSpawn;
 
+	//variables for hit boxes
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	class UHitBoxComponent* HitBoxBase;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UHitBoxComponent* HitBoxTurret;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UHitBoxComponent* HitBoxGun;
+	
+	//variable for projectile
 	UPROPERTY(EditDefaultsOnly, Category = "Combat")
 	TSubclassOf<class AProjectile> ProjectileClass;
-
+	
+	//variable for effects
 	UPROPERTY(EditAnywhere, Category= "Combat")
 	class UParticleSystem* HitParticles;
-
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	class USoundBase* DeathSound;
-
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TSubclassOf<UCameraShakeBase> HitCameraShakeDeathClass;
 };

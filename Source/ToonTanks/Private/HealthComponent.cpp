@@ -21,27 +21,45 @@ void UHealthComponent::BeginPlay()
 	Super::BeginPlay();
 
 	Health = MaxHealth;
-	GetOwner()->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::DamageTaken);
+	//GetOwner()->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::DamageTaken);
 	ToonTanksGameMode = Cast<AToonTanksGameMode>(UGameplayStatics::GetGameMode(this));
 }
 
-void UHealthComponent::DamageTaken(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
-	AController* Instigator, AActor* DamageCauser)
+void UHealthComponent::DamageTaken(float Damage)
 {
-	if(Damage <= 0.f) return;
+	if(Damage <= 0.f)
+	{
+		return;
+	}
 	Health -= Damage;
 	if(Health <= 0.f && ToonTanksGameMode)
 	{
-		ToonTanksGameMode->ActorDied(DamagedActor);
+		ToonTanksGameMode->ActorDied(GetOwner());
 	}
-	//UE_LOG(LogTemp, Warning, TEXT("Health of %s: %f"), *GetOwner()->GetName(), Health);
+	UE_LOG(LogTemp, Warning, TEXT("Health of %s: %f"), *GetOwner()->GetName(), Health);
+}
+
+void UHealthComponent::HealHealth(float Heal)
+{
+	if(Health == MaxHealth)
+	{
+		return;
+	}
+	else if (Health + Heal == MaxHealth || Health + Heal <= MaxHealth)
+	{
+		Health += Heal;
+	}
+	else if (Health + Heal > MaxHealth)
+	{
+		auto TempDamage = MaxHealth - Health;
+		Health += TempDamage;
+	}
+	UE_LOG(LogTemp, Warning, TEXT("Healing Health of %s: %f"), *GetOwner()->GetName(), Health);
 }
 
 // Called every frame
 void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
 }
 

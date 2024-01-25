@@ -7,7 +7,7 @@
 void AToonTanksPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-	GetPawn()->DisableInput(this);
+	//GetPawn()->DisableInput(this);
 	bShowMouseCursor = false;
 }
 

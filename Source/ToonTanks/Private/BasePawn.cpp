@@ -4,6 +4,7 @@
 #include "BasePawn.h"
 #include "Kismet/GameplayStatics.h"
 #include "Projectile.h"
+#include "HitBoxComponent.h"
 
 // Sets default values
 ABasePawn::ABasePawn()
@@ -12,11 +13,17 @@ ABasePawn::ABasePawn()
 	PrimaryActorTick.bCanEverTick = true;
 
 	BaseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Base Mesh"));
-	
 	RootComponent = BaseMesh;
+	HitBoxBase = CreateDefaultSubobject<UHitBoxComponent>(TEXT("HitBox Base"));
+	HitBoxBase->SetupAttachment(BaseMesh);
+	
 	TurretMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Turret Mesh"));
-	TurretMesh->SetupAttachment(BaseMesh, "Turret");
-
+	TurretMesh->SetupAttachment(BaseMesh);
+	HitBoxTurret = CreateDefaultSubobject<UHitBoxComponent>(TEXT("HitBox Turret"));
+	HitBoxTurret->SetupAttachment(TurretMesh);
+	HitBoxGun = CreateDefaultSubobject<UHitBoxComponent>(TEXT("HitBox Gun"));
+	HitBoxGun->SetupAttachment(TurretMesh);
+	
 	ProjectileSpawn = CreateDefaultSubobject<USceneComponent>(TEXT("Projectile Spawn"));
 	ProjectileSpawn-> SetupAttachment(TurretMesh);
 
@@ -51,7 +58,10 @@ void ABasePawn::RotatePawn(FVector LookAtTarget)
 void ABasePawn::Fire()
 {
 	auto Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, ProjectileSpawn->GetComponentLocation(), ProjectileSpawn->GetComponentRotation());
-	Projectile->SetOwner(this);
+	if(Projectile)
+	{
+		Projectile->SetOwner(this);
+	}
 }
 
 UStaticMeshComponent* ABasePawn::GetBaseMesh()
