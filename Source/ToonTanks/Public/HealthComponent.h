@@ -33,4 +33,6 @@ public:
 	void DamageTaken(float Damage);
 	void HealHealth(float Heal);
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	float GetHealth() const;
+	float GetMaxHealth() const;
 };

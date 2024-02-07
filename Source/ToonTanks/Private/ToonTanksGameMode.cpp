@@ -2,16 +2,31 @@
 
 
 #include "ToonTanksGameMode.h"
+
+#include "BreakingWall.h"
+#include "HealWrench.h"
+#include "PlayerPoint.h"
 #include "Kismet/GameplayStatics.h"
 #include "Tank.h"
 #include "ToonTanksPlayerController.h"
 #include "Tower.h"
 #include "Engine/EngineTypes.h"
 
+void AToonTanksGameMode::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	if(GetActorInLevelCount(PlayerPointClass) == 0)
+	{
+		GameOver(true);
+		ToonTanksPlayerController->SetPlayerEnabledState(false);
+	}
+}
+
 void AToonTanksGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 	HandleGameStart();
+	TimerRespawnWrench();
 }
 
 void AToonTanksGameMode::ActorDied(AActor* DeadActor) 
@@ -28,11 +43,30 @@ void AToonTanksGameMode::ActorDied(AActor* DeadActor)
 	else if (ATower* DestroyedTower = Cast<ATower>(DeadActor))
 	{
 		DestroyedTower->HandleDistraction();
-		if(GetTargetTowerCount() == 0)
-		{
-			GameOver(true);
-		}
 	}
+	else if(ABreakingWall* DestroyedWall = Cast<ABreakingWall>(DeadActor))
+	{
+		DestroyedWall->HandleDistraction();
+	}
+}
+
+void AToonTanksGameMode::SpawnWrenchInWorld()
+{
+	if(GetActorInLevelCount(HealWrenchClass) == 0)
+	{
+		GetWorld()->SpawnActor(HealWrenchClass,
+		&LocationsOfWrenches[FMath::RandRange(0, LocationsOfWrenches.Num()-1)]);
+	}
+}
+
+TSubclassOf<APlayerPoint> AToonTanksGameMode::GetPlayersPointClass() 
+{
+	return PlayerPointClass;
+}
+
+TSubclassOf<ATower> AToonTanksGameMode::GetTowersClass() 
+{
+	return ATower::StaticClass();
 }
 
 
@@ -57,10 +91,18 @@ void AToonTanksGameMode::HandleGameStart()
 	}
 }
 
-int32 AToonTanksGameMode::GetTargetTowerCount()
+void AToonTanksGameMode::TimerRespawnWrench()
 {
-	TArray<AActor*> TowersInTheWorld;
-	UGameplayStatics::GetAllActorsOfClass(this, ATower::StaticClass(), TowersInTheWorld);
-	return TowersInTheWorld.Num();
+	FTimerHandle WrenchRespawnTimer;
+	GetWorldTimerManager().SetTimer(WrenchRespawnTimer, this,
+		&AToonTanksGameMode::SpawnWrenchInWorld, HealDelay, true, -1);
+}
+
+template <class ActorClass>
+int32 AToonTanksGameMode::GetActorInLevelCount(ActorClass ClassOfActor)
+{
+	TArray<AActor*> ActorInTheWorld;
+	UGameplayStatics::GetAllActorsOfClass(this, ClassOfActor, ActorInTheWorld);
+	return ActorInTheWorld.Num();
 }
 

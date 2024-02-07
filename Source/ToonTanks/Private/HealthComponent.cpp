@@ -8,8 +8,6 @@
 // Sets default values for this component's properties
 UHealthComponent::UHealthComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
 }
@@ -21,7 +19,6 @@ void UHealthComponent::BeginPlay()
 	Super::BeginPlay();
 
 	Health = MaxHealth;
-	//GetOwner()->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::DamageTaken);
 	ToonTanksGameMode = Cast<AToonTanksGameMode>(UGameplayStatics::GetGameMode(this));
 }
 
@@ -36,7 +33,6 @@ void UHealthComponent::DamageTaken(float Damage)
 	{
 		ToonTanksGameMode->ActorDied(GetOwner());
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Health of %s: %f"), *GetOwner()->GetName(), Health);
 }
 
 void UHealthComponent::HealHealth(float Heal)
@@ -45,7 +41,7 @@ void UHealthComponent::HealHealth(float Heal)
 	{
 		return;
 	}
-	else if (Health + Heal == MaxHealth || Health + Heal <= MaxHealth)
+	if (Health + Heal == MaxHealth || Health + Heal <= MaxHealth)
 	{
 		Health += Heal;
 	}
@@ -54,12 +50,21 @@ void UHealthComponent::HealHealth(float Heal)
 		auto TempDamage = MaxHealth - Health;
 		Health += TempDamage;
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Healing Health of %s: %f"), *GetOwner()->GetName(), Health);
 }
 
 // Called every frame
 void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+}
+
+float UHealthComponent::GetHealth() const 
+{
+	return Health;
+}
+
+float UHealthComponent::GetMaxHealth() const
+{
+	return MaxHealth;
 }
 

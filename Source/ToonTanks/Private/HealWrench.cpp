@@ -4,6 +4,7 @@
 #include "HealWrench.h"
 
 #include "HitBoxComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AHealWrench::AHealWrench()
@@ -20,21 +21,42 @@ void AHealWrench::BeginPlay()
 {
 	Super::BeginPlay();
 	WrenchMesh->OnComponentBeginOverlap.AddDynamic(this, &AHealWrench::BeginOverlap);
+	StartLocation = GetActorLocation();
 }
 
 void AHealWrench::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	auto HitBox = Cast<UHitBoxComponent>(OtherComp);
-	UE_LOG(LogTemp, Warning, TEXT("Name of component: %s"), *OtherComp->GetName());
 	if(HitBox)
 	{
 		HitBox->DamageHealed(Heal);
 		this->Destroy();
+		if(LaunchSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, LaunchSound, GetActorLocation(), GetActorRotation());
+		}
+		if(HitParticles)
+		{
+			UGameplayStatics::SpawnEmitterAtLocation(this, HitParticles, GetActorLocation(), GetActorRotation());
+		}
+	}
+}
+
+void AHealWrench::MoveWrench(float DeltaTime)
+{
+	if(DistanceForMove <= FVector::Dist(StartLocation, GetActorLocation()))
+	{
+		FVector MoveDirection = WrenchVelocity.GetSafeNormal();
+		StartLocation += (MoveDirection * DistanceForMove);
+		SetActorLocation(StartLocation);
+		WrenchVelocity = -WrenchVelocity;
 	}
 	else
 	{
-		return;
+		FVector CurrentLocation = GetActorLocation();
+		CurrentLocation += (DeltaTime * WrenchVelocity);
+		SetActorLocation(CurrentLocation);
 	}
 }
 
@@ -42,6 +64,7 @@ void AHealWrench::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor*
 void AHealWrench::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	MoveWrench(DeltaTime);
+	
 }
 

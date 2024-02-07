@@ -29,7 +29,16 @@ private:
 	void BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
 	const FHitResult& SweepResult);
-	
+	//move
+	float DistanceForMove = 50.f;
+	FVector StartLocation;
+	FVector WrenchVelocity = {0, 0, 70};
+	void MoveWrench(float DeltaTime);
+	//efects
+	UPROPERTY(EditAnywhere, Category= "Combat")
+	class UParticleSystem* HitParticles;
+	UPROPERTY(EditAnywhere, Category= "Combat")
+	class USoundBase* LaunchSound;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

@@ -23,19 +23,19 @@ private:
 	//variables for camera
 	UPROPERTY(VisibleAnywhere,  Category= "Components")
 	class USpringArmComponent * SpringArm;
-	UPROPERTY(VisibleAnywhere, Category= "Components")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent * Camera;
 	
 	//variables for tank
-	UPROPERTY(EditAnywhere,  Category= "Movement")
-	float Speed = 6000.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	float Speed = 5.f;
 	UPROPERTY(EditAnywhere,  Category= "Movement")
 	float TurnRate = 200.f;
-	
 	class AToonTanksPlayerController* TankPlayerController;
 	
 	//functions
 	virtual void RotatePawn(FVector LookAtTarget) override;
+	FVector GetSurfaceNormal();
 	void Move(float Value);
 	void Turn(float Value);
 	

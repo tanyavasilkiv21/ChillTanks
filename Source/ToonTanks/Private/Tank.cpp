@@ -8,8 +8,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
 #include "ToonTanksPlayerController.h"
-#include "Kismet/KismetMathLibrary.h"
-#include "Navigation/PathFollowingComponent.h"
 
 ATank::ATank()
 {
@@ -49,7 +47,8 @@ void ATank::BeginPlay()
 
 void ATank::Move(float Value)
 {
-	GetBaseMesh()->AddImpulse(GetBaseMesh()->GetForwardVector() * 9000.f * Value);
+	SetActorRotation(GetActorRotation().GetNormalized());
+	SetActorLocation(GetActorLocation()+GetActorRotation().GetNormalized().Vector()*Speed*Value);
 }
 
 void ATank::Turn(float Value)
@@ -71,6 +70,24 @@ void ATank::RotatePawn(FVector LookAtTarget)
 	GetTurretMesh()->SetRelativeRotation(Temp);
 }
 
+FVector ATank::GetSurfaceNormal()
+{
+	FVector Start = GetActorLocation();
+	FVector End = Start - FVector(0, 0, 1000); 
+
+	FHitResult HitResult;
+	FCollisionQueryParams CollisionParams;
+	CollisionParams.AddIgnoredActor(this);
+
+	if (GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, CollisionParams))
+	{
+		return HitResult.ImpactNormal;
+		
+	}
+	return FVector::ZeroVector;
+}
+
+
 void ATank::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -79,7 +96,7 @@ void ATank::Tick(float DeltaTime)
 	{
 		FHitResult HitResult;
 		TankPlayerController->GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
-		//DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 20.f ,16, FColor::Silver, false, -1.f);
+		DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 20.f ,16, FColor::Silver, false, -1.f);
 		RotatePawn(HitResult.ImpactPoint);
 	}
 }

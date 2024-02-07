@@ -46,7 +46,6 @@ void AProjectile::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor*
 		Destroy();
 		return;
 	};
-	UE_LOG(LogTemp, Warning, TEXT("Name of component: %s"), *OtherComp->GetName());
 	auto HitBox = Cast<UHitBoxComponent>(OtherComp);
 	if(OtherActor && OtherActor!= nullptr && OtherActor != MyOwner && !(OtherActor->IsHidden()))
 	{
@@ -59,7 +58,6 @@ void AProjectile::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor*
 		{
 			return;
 		}
-		//UGameplayStatics::ApplyDamage(OtherActor, Damage, MyOwnerInstigator, this, DamageTypeClass);
 		if(HitCameraShakeClass)
 		{
 			GetWorld()->GetFirstPlayerController()->ClientStartCameraShake(HitCameraShakeClass);
