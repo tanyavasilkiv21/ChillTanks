@@ -7,14 +7,14 @@ When you launch game, the start menu greets you.
 - Start game (when you press this button, you can choose level).
 - How to play? (when you press this button, you can see help menu)
 - Exit (when you press this button, you can leave the game)
-- 
+ 
 ![](Media/start-menu.png)
 
 *Levels:*
 
 - Mountain level
 - Beach level
-- 
+ 
 ![](Media/select.png)
 
 Your character is blue tank.
