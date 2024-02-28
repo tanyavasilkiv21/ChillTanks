@@ -17,6 +17,7 @@ private:
 
 	bool bPlayerEnable = false;
 public:
+	UFUNCTION(BlueprintCallable)
 	void SetPlayerEnabledState(bool bPlayerEnabledData);
 	bool IsEnable();
 	

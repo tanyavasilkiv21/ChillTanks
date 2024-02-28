@@ -36,7 +36,7 @@ private:
 	void MoveWrench(float DeltaTime);
 	//efects
 	UPROPERTY(EditAnywhere, Category= "Combat")
-	class UParticleSystem* HitParticles;
+	class UNiagaraSystem* HitParticles;
 	UPROPERTY(EditAnywhere, Category= "Combat")
 	class USoundBase* LaunchSound;
 public:	

@@ -6,7 +6,6 @@
 #include "BasePawn.h"
 #include "Tower.generated.h"
 
-
 UCLASS()
 class TOONTANKS_API ATower : public ABasePawn
 {
@@ -15,7 +14,7 @@ class TOONTANKS_API ATower : public ABasePawn
 public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void HandleDistraction() override;
-	
+	void SetIsGamePlay(bool Data);
 	
 protected:
 	//functions
@@ -27,6 +26,8 @@ protected:
 	float FireRange = 1000.f;
 	class ATank *Tank;
 	FTimerHandle FireRateTimeHandle;
+	FTimerHandle RangeTimeHandle;
 	UPROPERTY(EditAnywhere, Category= "Distance")
 	float FireRate = 2.f;
+	bool IsGamePlay = true;
 };

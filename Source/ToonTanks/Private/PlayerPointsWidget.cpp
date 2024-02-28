@@ -2,28 +2,20 @@
 
 
 #include "PlayerPointsWidget.h"
-
 #include "ToonTanksGameMode.h"
 
 void UPlayerPointsWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 	GameMode = Cast<AToonTanksGameMode>(GetWorld()->GetAuthGameMode());
-	PlayerPointsInStart = CalculateCountPlayerPoints();
 }
 
 int32 UPlayerPointsWidget::GetPlayerPointsInStart()
 {
-	return PlayerPointsInStart;
+	return GameMode->GetPlayerPointsStart();
 }
 
-int32 UPlayerPointsWidget::CalculateCountPlayerPoints()
+int32 UPlayerPointsWidget::GetPlayerPointsCurrent()
 {
-	return GameMode->GetActorInLevelCount(GameMode->GetPlayersPointClass());
+	return GameMode->GetPlayerPointsStart() - GameMode->GetPlayerPointsCurrent();
 }
-
-int32 UPlayerPointsWidget::CalculateCollectedCountPlayerPoints()
-{
-	return (PlayerPointsInStart - CalculateCountPlayerPoints());
-}
-

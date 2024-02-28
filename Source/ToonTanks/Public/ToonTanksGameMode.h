@@ -27,34 +27,41 @@ protected:
 public:
 	void ActorDied(AActor* DeadActor);
 	void SpawnWrenchInWorld();
-	template<class ActorClass>
-	int32 GetActorInLevelCount(ActorClass ClassOfActor);
-	TSubclassOf<class APlayerPoint> GetPlayersPointClass();
-	TSubclassOf<class ATower> GetTowersClass();
+	void DecreasePlayersPoints();
+
+	int32 GetPlayerPointsStart() const;
+	int32 GetPlayerPointsCurrent() const;
+	int32 GetTowersStart() const;
+	int32 GetTowersCurrent() const;
 private:
 	//variables
 	class ATank* Player;
 	class AToonTanksPlayerController* ToonTanksPlayerController;
+
+	int32 CountPlayerPointsStart;
+	int32 CountTowersStart;
+	
+	int32 CountPlayerPointsCurrent;
+	int32 CountTowersCurrent;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Heal")
 	TSubclassOf<class AHealWrench> HealWrenchClass;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Points")
-	TSubclassOf<APlayerPoint> PlayerPointClass;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Towers")
-	TSubclassOf<ATower> TurretTower;
-	UPROPERTY(EditDefaultsOnly, Category = "Towers")
-	TSubclassOf<ATower> Tower;
+	TSubclassOf<class APlayerPoint> PlayerPointClass;
 	
 	float StartDelay = 3.f;
 	UPROPERTY(EditAnywhere)
 	float HealDelay = 10.f;
-	TArray<FVector> LocationsOfWrenches = {{-133, -284, 20},
-		{933, -847, 20}, {1647, -284, 20}, {700, -284, 20}};
+	UPROPERTY(EditDefaultsOnly, Category = "Heal")
+	TArray<FVector> LocationsOfWrenches;
 	
 	//functions
 	void HandleGameStart();
 	void TimerRespawnWrench();
+
+	int32 GetTowersInLevelCount();
+	int32 GetPlayersPointsInLevelCount();
+	int32 GetHealsInLevelCount();
 };
 

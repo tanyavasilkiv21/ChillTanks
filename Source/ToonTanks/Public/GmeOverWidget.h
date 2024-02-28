@@ -14,14 +14,11 @@ class TOONTANKS_API UGmeOverWidget : public UPlayerPointsWidget
 {
 	GENERATED_BODY()
 protected:
-	//variables
-	int32 TowersInStart;
 	//functions
 	virtual void NativeConstruct() override;
-
+	
 	UFUNCTION(BlueprintPure)
 	int32 GetTowersInStart();
-	int32 CalculateCountTowers();
 	UFUNCTION(BlueprintPure)
-	int32 CalculateCollectedCountTowers();
+	int32 GetTowersCurrent();
 };

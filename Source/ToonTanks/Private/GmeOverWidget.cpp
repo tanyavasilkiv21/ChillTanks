@@ -10,21 +10,14 @@ void UGmeOverWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 	GameMode = Cast<AToonTanksGameMode>(GetWorld()->GetAuthGameMode());
-	TowersInStart = CalculateCountTowers();
 }
 
 int32 UGmeOverWidget::GetTowersInStart()
 {
-	return TowersInStart;
+	return GameMode->GetTowersStart();
 }
 
-int32 UGmeOverWidget::CalculateCountTowers()
+int32 UGmeOverWidget::GetTowersCurrent()
 {
-	return GameMode->GetActorInLevelCount(GameMode->GetTowersClass());
-	
-}
-
-int32 UGmeOverWidget::CalculateCollectedCountTowers()
-{
-	return (TowersInStart - CalculateCountTowers());
+	return GameMode->GetTowersStart() - GameMode->GetTowersCurrent();
 }

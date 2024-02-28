@@ -15,16 +15,29 @@
 void AToonTanksGameMode::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-	if(GetActorInLevelCount(PlayerPointClass) == 0)
+	if(CountPlayerPointsCurrent == 0)
 	{
 		GameOver(true);
+		TArray<AActor*> TowerInTheWorld;
+		UGameplayStatics::GetAllActorsOfClass(this, ATower::StaticClass(), TowerInTheWorld);
+		for(int32 i = 0; i < TowerInTheWorld.Num(); i++)
+		{
+			ATower* Temp = Cast<ATower>(TowerInTheWorld[i]);
+			Temp->SetIsGamePlay(false);
+		}
 		ToonTanksPlayerController->SetPlayerEnabledState(false);
+		ToonTanksPlayerController->bShowMouseCursor = true;
+		SetActorTickEnabled(false);
 	}
 }
 
 void AToonTanksGameMode::BeginPlay()
 {
 	Super::BeginPlay();
+	CountTowersStart = GetTowersInLevelCount();
+	CountPlayerPointsStart = GetPlayersPointsInLevelCount();
+	CountTowersCurrent = CountTowersStart;
+	CountPlayerPointsCurrent = CountPlayerPointsStart;
 	HandleGameStart();
 	TimerRespawnWrench();
 }
@@ -43,6 +56,7 @@ void AToonTanksGameMode::ActorDied(AActor* DeadActor)
 	else if (ATower* DestroyedTower = Cast<ATower>(DeadActor))
 	{
 		DestroyedTower->HandleDistraction();
+		CountTowersCurrent--;
 	}
 	else if(ABreakingWall* DestroyedWall = Cast<ABreakingWall>(DeadActor))
 	{
@@ -52,23 +66,37 @@ void AToonTanksGameMode::ActorDied(AActor* DeadActor)
 
 void AToonTanksGameMode::SpawnWrenchInWorld()
 {
-	if(GetActorInLevelCount(HealWrenchClass) == 0)
+	if(GetHealsInLevelCount() == 0)
 	{
 		GetWorld()->SpawnActor(HealWrenchClass,
 		&LocationsOfWrenches[FMath::RandRange(0, LocationsOfWrenches.Num()-1)]);
 	}
 }
 
-TSubclassOf<APlayerPoint> AToonTanksGameMode::GetPlayersPointClass() 
+void AToonTanksGameMode::DecreasePlayersPoints()
 {
-	return PlayerPointClass;
+	CountPlayerPointsCurrent--;
 }
 
-TSubclassOf<ATower> AToonTanksGameMode::GetTowersClass() 
+int32 AToonTanksGameMode::GetPlayerPointsStart() const
 {
-	return ATower::StaticClass();
+	return CountPlayerPointsStart;
 }
 
+int32 AToonTanksGameMode::GetPlayerPointsCurrent() const
+{
+	return CountPlayerPointsCurrent;
+}
+
+int32 AToonTanksGameMode::GetTowersStart() const
+{
+	return CountTowersStart;
+}
+
+int32 AToonTanksGameMode::GetTowersCurrent() const
+{
+	return CountTowersCurrent;
+}
 
 void AToonTanksGameMode::HandleGameStart()
 {
@@ -96,13 +124,28 @@ void AToonTanksGameMode::TimerRespawnWrench()
 	FTimerHandle WrenchRespawnTimer;
 	GetWorldTimerManager().SetTimer(WrenchRespawnTimer, this,
 		&AToonTanksGameMode::SpawnWrenchInWorld, HealDelay, true, -1);
+	
 }
 
-template <class ActorClass>
-int32 AToonTanksGameMode::GetActorInLevelCount(ActorClass ClassOfActor)
+int32 AToonTanksGameMode::GetTowersInLevelCount()
 {
 	TArray<AActor*> ActorInTheWorld;
-	UGameplayStatics::GetAllActorsOfClass(this, ClassOfActor, ActorInTheWorld);
+	UGameplayStatics::GetAllActorsOfClass(this, ATower::StaticClass(), ActorInTheWorld);
 	return ActorInTheWorld.Num();
 }
+
+int32 AToonTanksGameMode::GetPlayersPointsInLevelCount()
+{
+	TArray<AActor*> ActorInTheWorld;
+	UGameplayStatics::GetAllActorsOfClass(this, PlayerPointClass, ActorInTheWorld);
+	return ActorInTheWorld.Num();
+}
+
+int32 AToonTanksGameMode::GetHealsInLevelCount()
+{
+	TArray<AActor*> ActorInTheWorld;
+	UGameplayStatics::GetAllActorsOfClass(this, HealWrenchClass, ActorInTheWorld);
+	return ActorInTheWorld.Num();
+}
+
 

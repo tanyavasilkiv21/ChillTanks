@@ -4,15 +4,16 @@
 #include "PlayerPoint.h"
 #include "Tank.h"
 #include "Kismet/GameplayStatics.h"
+#include "ToonTanksGameMode.h"
 
 // Sets default values
 APlayerPoint::APlayerPoint()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
 	PlayerPointMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Point Mesh"));
 	RootComponent = PlayerPointMesh;
+	
 }
 
 // Called when the game starts or when spawned
@@ -20,6 +21,7 @@ void APlayerPoint::BeginPlay()
 {
 	Super::BeginPlay();
 	Player = Cast<ATank>(UGameplayStatics::GetPlayerPawn(this, 0));
+	GameMode = Cast<AToonTanksGameMode>(GetWorld()->GetAuthGameMode());
 	PlayerPointMesh->OnComponentBeginOverlap.AddDynamic(this, &APlayerPoint::BeginOverlap);
 }
 
@@ -28,7 +30,12 @@ void APlayerPoint::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 {
 	if(OtherActor == Player)
 	{
+		GameMode->DecreasePlayersPoints();
 		Destroy();
+		if(LaunchSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, LaunchSound, GetActorLocation(), GetActorRotation());
+		}
 	}
 }
 

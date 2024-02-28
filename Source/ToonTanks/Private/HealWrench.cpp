@@ -5,6 +5,7 @@
 
 #include "HitBoxComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "NiagaraFunctionLibrary.h"
 
 // Sets default values
 AHealWrench::AHealWrench()
@@ -38,7 +39,9 @@ void AHealWrench::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor*
 		}
 		if(HitParticles)
 		{
-			UGameplayStatics::SpawnEmitterAtLocation(this, HitParticles, GetActorLocation(), GetActorRotation());
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(this,HitParticles,
+				OtherActor->GetActorLocation(), OtherActor->GetActorRotation());
+			
 		}
 	}
 }

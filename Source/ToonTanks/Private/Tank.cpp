@@ -96,7 +96,7 @@ void ATank::Tick(float DeltaTime)
 	{
 		FHitResult HitResult;
 		TankPlayerController->GetHitResultUnderCursor(ECC_Visibility, false, HitResult);
-		DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 20.f ,16, FColor::Silver, false, -1.f);
+		//DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 20.f ,16, FColor::Silver, false, -1.f);
 		RotatePawn(HitResult.ImpactPoint);
 	}
 }
