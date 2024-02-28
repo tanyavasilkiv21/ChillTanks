@@ -1,4 +1,4 @@
-## *Chill Tanks*
+## *Chill Tank*
 it's game about tank, towers, flowers and bananas with lofi hip-hop bits.
 ### *Game process*
 The main goal of the game - collect all flowers/bananas at the level. 
