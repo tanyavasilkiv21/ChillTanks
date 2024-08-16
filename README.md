@@ -3,6 +3,7 @@ it's game about tank, towers, flowers and bananas with lofi hip-hop bits.
 ### *Game process*
 The main goal of the game - collect all flowers/bananas at the level. 
 When you launch game, the start menu greets you.
+
 *Menu's buttons*:   
 - Start game (when you press this button, you can choose level).
 - How to play? (when you press this button, you can see help menu)
